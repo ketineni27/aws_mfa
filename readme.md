@@ -22,6 +22,13 @@ This script is meant to be used from a bash shell. This works from my Macbook Pr
 Using profiles is a requirement for this script.  Use them...  
 https://docs.aws.amazon.com/cli/latest/userguide/cli-multiple-profiles.html
 
+Update your ``` $HOME/.aws/credentials ``` file to also include:
+
+```
+[mfa]
+
+```
+
 
 ### Usage
 1) clone this repo:  
