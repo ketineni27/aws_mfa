@@ -53,3 +53,8 @@ export AWS_SECURITY_TOKEN="FQoGZXIvYXdzEIH//////////wEaDIJHn2mOY0WMZmBcSiKwAdWgx
 aws s3 ls --profile aws-is-rad --region us-east-2
 2017-07-21 15:55:00 our-really-cool-s3-bucket-us-east-2
 ```
+
+
+## NOTICE
+
+**This script will make changes to your credentials file, use at your own risk!**
