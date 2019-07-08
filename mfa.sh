@@ -2,6 +2,9 @@
 
 ### You can set this in your .bash_profile as a environment var... or edit this script
 AWS_MFA_DEVICE="${AWS_MFA_DEVICE:-arn:aws:iam::0123456789:mfa/iam.username}"
+TOKEN_FILE="${HOME}/.vars/aws_token_file"
+CREDENTIALS="${HOME}/.aws/credentials"
+AWS_CACHE="${HOME}/.aws/cli/cache"
 
 
 ### You should not need to change anything below this line...
@@ -20,9 +23,6 @@ if ! [ -x "$(command -v jq)" ]; then
 fi
 
 AWSCMD="aws sts get-session-token --output json"
-TOKEN_FILE="${HOME}/.vars/aws_token_file"
-CREDENTIALS="${HOME}/.aws/credentials"
-AWS_CACHE="${HOME}/.aws/cli/cache"
 
 ### Remove any stale ${TOKEN_FILE} and clear our cache
 rm -rf ${TOKEN_FILE} ${AWS_CACHE}
