@@ -1,38 +1,65 @@
 #!/bin/sh
-AWS_DEVICE="arn:aws:iam::075520607603:mfa/rob.hough"
-AWSCMD="aws sts get-session-token --output text"
-TOKEN_FILE="${HOME}/.token_file"
+
+### You can set this in your .bash_profile as a environment var... or edit this script
+AWS_MFA_DEVICE="${AWS_MFA_DEVICE:-arn:aws:iam::0123456789:mfa/iam.username}"
+
+
+### You should not need to change anything below this line...
+#---------------------------------------------------------------------------------------------
+
+### Validate the aws cli is installed
+if ! [ -x "$(command -v aws)" ]; then
+  echo 'Error: aws is not installed.' >&2
+  exit 1
+fi
+
+### Validate that jq is installed
+if ! [ -x "$(command -v jq)" ]; then
+  echo 'Error: jq is not installed.' >&2
+  exit 1
+fi
+
+AWSCMD="aws sts get-session-token --output json"
+TOKEN_FILE="${HOME}/.vars/aws_token_file"
 CREDENTIALS="${HOME}/.aws/credentials"
 AWS_CACHE="${HOME}/.aws/cli/cache"
 
-### Remove any stale ${TOKEN_FILE}
-rm -rf ${TOKEN_FILE}
-
-### Clear our CLI cache
-rm -rf ${AWS_CACHE}
+### Remove any stale ${TOKEN_FILE} and clear our cache
+rm -rf ${TOKEN_FILE} ${AWS_CACHE}
 
 ### Create a backup of our credentials file
 cp ${CREDENTIALS}{,.$(date +%s)}
 
+### Clear previous credentials
+unset AWS_ACCESS_KEY_ID AWS_SECRET_ACCESS_KEY AWS_SECURITY_TOKEN AWS_SESSION_TOKEN
+
 ### Get a new token
-${AWSCMD} --serial-number ${AWS_DEVICE} --token-code $1 | \
- awk '{printf("export AWS_ACCESS_KEY_ID=\"%s\"\nexport AWS_SECRET_ACCESS_KEY=\"%s\"\nexport AWS_SESSION_TOKEN=\"%s\"\nexport AWS_SECURITY_TOKEN=\"%s\"\n",$2,$4,$5,$5)}' | tee ${TOKEN_FILE}
+CREDENTIALS_OUTPUT=$(${AWSCMD} --serial-number ${AWS_MFA_DEVICE} --token-code $1)
 
-### Clear out old MFA data - yes - this creates a backup too
-sed -i .bak '1,/\[mfa.*/!d' ${CREDENTIALS}
+AWS_ACCESS_KEY=$(echo ${CREDENTIALS_OUTPUT}|jq -r '.Credentials.AccessKeyId')
+AWS_SECRET_ACCESS_KEY=$(echo ${CREDENTIALS_OUTPUT}|jq -r '.Credentials.SecretAccessKey')
+AWS_SESSION_TOKEN=$(echo ${CREDENTIALS_OUTPUT}|jq -r '.Credentials.SessionToken')
+AWS_SECURITY_TOKEN=${AWS_SESSION_TOKEN}
 
-### grab data from token file to populate some vars
-aws_access_id=$(grep AWS_ACCESS_KEY_ID ${TOKEN_FILE} |cut -d= -f 2 | sed -e 's/^"//' -e 's/"$//')
-aws_secret_access_key=$(grep AWS_SECRET_ACCESS_KEY ${TOKEN_FILE} |cut -d= -f 2 | sed -e 's/^"//' -e 's/"$//')
-aws_session_token=$(grep AWS_SESSION_TOKEN ${TOKEN_FILE} |cut -d= -f 2 | sed -e 's/^"//' -e 's/"$//')
-
-### Spit out something we can cut & paste
-cat <<EOF>>${CREDENTIALS}
-output=json
-region=us-east-2
-aws_access_key_id=${aws_access_id}
-aws_secret_access_key=${aws_secret_access_key}
-aws_session_token=${aws_session_token}
+### Create the token_file
+cat << EOF >> ${TOKEN_FILE}
+export AWS_ACCESS_KEY=${AWS_ACCESS_KEY}
+export AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}
+export AWS_SESSION_TOKEN=${AWS_SESSION_TOKEN}
+export AWS_SECURITY_TOKEN=${AWS_SECURITY_TOKEN}
 EOF
 
-source ${TOKEN_FILE}
+# ### Clear out old MFA data - yes - this creates a backup too
+sed -i .bak '1,/\[mfa.*/!d' ${CREDENTIALS}
+
+# ### Spit out something we can cut & paste
+cat << EOF >> ${CREDENTIALS}
+output=json
+region=us-east-2
+aws_access_key_id=${AWS_ACCESS_KEY}
+aws_secret_access_key=${AWS_SECRET_ACCESS_KEY}
+aws_session_token=${AWS_SESSION_TOKEN}
+EOF
+
+# ### Clean up old stuff
+find ${HOME}/.aws -type f -name credentials.\* -mtime +7 -exec rm {} \;
