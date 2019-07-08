@@ -10,13 +10,15 @@ This script is meant to be used from a bash shell. This works from my Macbook Pr
   - Windows: Git-Bash (not tested)
   - Mac: Terminal
   - Linux: Terminal
-
 2) You will need a validate AWS account
 3) You will need the AWS CLI tools installed and configured:
   - https://docs.aws.amazon.com/cli/latest/userguide/installing.html  
 4) You will need an MFA device assigned to your IAM account
 5) You will need the arn for your MFA (Assigned MFA Device, below):
 ![Assigned MFA Device](https://github.com/rch317/aws_mfa/blob/master/images/virtual_device.png)
+6) You will need the 'jq' tool installed:  
+![Download jq](https://stedolan.github.io/jq/download/)
+
 
 ### Configuring the AWS CLI tool
 Using profiles is a requirement for this script.  Use them...  
@@ -43,7 +45,14 @@ git clone git@github.com:rch317/aws_mfa.git
 cp aws_mfa/mfa.sh ~/bin
 ```
 
-3) Execute the mfa.sh script, you need to pass your MFA token to the script
+3) Edit the mfa.sh script and update the locations if needed. Create the
+.vars directory if you don't already have one:
+
+```
+mkdir -p ~/.vars
+```
+
+4) Execute the mfa.sh script, you need to pass your MFA token to the script
 
 ```
 $ ./mfa.sh 123456
@@ -60,6 +69,7 @@ export AWS_SECURITY_TOKEN="FQoGZXIvYXdzEIH//////////wEaDIJHn2mOY0WMZmBcSiKwAdWgx
 aws s3 ls --profile aws-is-rad --region us-east-2
 2017-07-21 15:55:00 our-really-cool-s3-bucket-us-east-2
 ```
+
 
 
 ## NOTICE
