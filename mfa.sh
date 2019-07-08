@@ -28,7 +28,9 @@ AWSCMD="aws sts get-session-token --output json"
 rm -rf ${TOKEN_FILE} ${AWS_CACHE}
 
 ### Create a backup of our credentials file
-cp ${CREDENTIALS}{,.$(date +%s)}
+#cp ${CREDENTIALS}{,.$(date +%s)}
+cp ${CREDENTIALS} ${CREDENTIALS}.$(date +%s)
+
 
 ### Clear previous credentials
 unset AWS_ACCESS_KEY_ID AWS_SECRET_ACCESS_KEY AWS_SECURITY_TOKEN AWS_SESSION_TOKEN
