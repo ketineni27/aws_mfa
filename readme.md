@@ -22,7 +22,7 @@ This script is meant to be used from a bash shell. This works from my Macbook Pr
 ![Assigned MFA Device](https://github.com/rch317/aws_mfa/blob/master/images/virtual_device.png)  
 
 6) You will need the 'jq' tool installed:  
-![Download jq](https://stedolan.github.io/jq/download/)
+[Download jq](https://stedolan.github.io/jq/download/)
 
 
 ### Configuring the AWS CLI tool
