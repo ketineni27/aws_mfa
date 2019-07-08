@@ -78,6 +78,9 @@ the following code to your .bash_profile to auto-load these variables any time y
 open a new terminal window.  This will work for the duration of the token (12hrs).
 
 ```
+### Delete our aws_token_file if more than 12hrs old.
+find ${HOME}/.vars -type f -name aws_token_file -mmin +3600 -exec rm {} \;
+
 ### Load various environment vars
 myVars="${HOME}/.vars"
 for file in $(ls ${myVars}/)
