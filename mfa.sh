@@ -51,6 +51,9 @@ export AWS_SESSION_TOKEN=${AWS_SESSION_TOKEN}
 export AWS_SECURITY_TOKEN=${AWS_SECURITY_TOKEN}
 EOF
 
+### secure the token file from prying eyes
+chmod 0600 ${TOKEN_FILE} 2> /dev/null
+
 # ### Clear out old MFA data - yes - this creates a backup too
 sed -i .bak '1,/\[mfa.*/!d' ${CREDENTIALS}
 
