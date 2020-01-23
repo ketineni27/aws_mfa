@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 ### You can set this in your .bash_profile as a environment var... or edit this script
 AWS_MFA_DEVICE="${AWS_MFA_DEVICE:-arn:aws:iam::0123456789:mfa/iam.username}"
