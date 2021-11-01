@@ -1,5 +1,5 @@
 # AWS MFA
-
+hello from all
 
 This script is meant to be used from a bash shell. This works from my Macbook Pro,  YMMV...
 
